@@ -1,0 +1,36 @@
+FROM centos:7
+
+ARG PERL_VERSION=5.30.1
+ARG ASSET_VERSION=local_build
+ARG GREP_EXCLUDE='(ld.so|ld-linux-x86-64.so|libBrokenLocale.so|libSegFault.so|libanl.so|libc.so|libdl.so|libm.so|libmvec.so|libnss_compat.so|libnss_dns.so|libnss_files.so|libpthread.so|libresolv.so|librt.so|libthread_db.so|libutil.so|vdso.so)'
+ARG CPAN_MODULES="DBI JSON LWP LWP::UserAgent LWP::Protocol::https XML::LibXML Text::CSV IO::Socket::SSL Time::Zone HTTP::Response Net::SMTP WWW::Mechanize DateTime Test::Simple Net::SNMP AutoLoader Getopt::Long IO::File Module::Load File::Basename Digest::MD5 Data::Dumper"
+
+
+RUN yum update -y && yum groupinstall -y "Development Tools" && yum install -y curl expat-devel openssl openssl-devel
+
+RUN curl -s -L https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-${PERL_VERSION}.tar.gz -o perl-${PERL_VERSION}.tar.gz && \
+  tar xzf perl-${PERL_VERSION}.tar.gz && \
+  cd perl-${PERL_VERSION} && \
+  sh Configure -Dprefix=/opt/perl -des && \
+  make && \
+  make test && \
+  make install && \
+  curl -s -L https://cpanmin.us | /opt/perl/bin/perl - App::cpanminus && \
+  PATH=/opt/perl/bin:${PATH} cpanm Monitoring::Plugin && \
+  PATH=/opt/perl/bin:${PATH} cpanm ${CPAN_MODULES} --force && \
+  rm -rf /opt/perl/man /perl-${PERL_VERSION}.tar.gz /perl-${PERL_VERSION} /root/.cpanm && \
+  cd /opt/perl/lib/site_perl/${PERL_VERSION} && \
+  cp -a -f . ../../${PERL_VERSION} && \
+  cd / && \
+  rm -rf /opt/perl/lib/site_perl/${PERL_VERSION} /perl-${PERL_VERSION}.tar.gz /perl-${PERL_VERSION} /root/.cpanm && \
+  yum clean all
+
+RUN LIBS=$(find /opt/perl -type f -executable -exec ldd {} 2>/dev/null \;|  grep "=>" | egrep -v ${GREP_EXCLUDE} | awk '{print $3}'| sort -u ) && \
+  for f in $LIBS; do if [ -e $f ]; then echo "Copying Library: $f" && cp $f /opt/perl/lib/; fi; done
+
+RUN mkdir /assets/ && \
+  export SENSU_ASSET="/assets/sensu-perl-runtime_${ASSET_VERSION}_perl-${PERL_VERSION}_$(source /etc/os-release && echo $ID)_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.tar.gz" && \
+  tar -czf $SENSU_ASSET -C /opt/perl/ . && \
+  ls -l $SENSU_ASSET
+
+ENV PATH=$PATH:/opt/perl/bin

@@ -1,0 +1,8 @@
+language: perl
+services:
+  - docker
+script:
+  - "./build_platforms.sh"
+  - "./checksum.sh"
+  - "./upload.sh"
+env:
