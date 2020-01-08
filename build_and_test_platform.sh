@@ -11,7 +11,6 @@ if [ "${asset_version}" = "local-build" ]; then
   ignore_errors=1
 fi
 
-
 echo "Platform: ${platform}"
 echo "Check for asset file: ${asset_filename}"
 if [ -f "$PWD/dist/${asset_filename}" ]; then
@@ -36,7 +35,6 @@ else
     [ $ignore_errors -eq 0 ] && exit 1  
   fi
 fi
-
 
 test_arr=($test_platforms)
 for test_platform in "${test_arr[@]}"; do

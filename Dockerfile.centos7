@@ -7,7 +7,6 @@ ARG CPAN_MODULES="DBI JSON LWP LWP::UserAgent LWP::Protocol::https XML::LibXML T
 ARG MAKE_TEST_CMD="make test"
 ARG CPANM_TEST_FLAG=""
 
-
 RUN yum update -y && yum groupinstall -y "Development Tools" && yum install -y curl expat-devel openssl openssl-devel
 
 RUN curl -s -L https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-${PERL_VERSION}.tar.gz -o perl-${PERL_VERSION}.tar.gz && \

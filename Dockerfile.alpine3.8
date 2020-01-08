@@ -11,7 +11,6 @@ RUN apk --no-cache add build-base gmp-dev zlib-dev gdbm-dev db-dev readline-dev 
 RUN apk --no-cache add openssh-client openssl openssl-dev expat-dev
 RUN apk --no-cache add curl wget git sudo bash bash-doc bash-completion procps findutils
 
-
 RUN curl -s -L https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-${PERL_VERSION}.tar.gz -o perl-${PERL_VERSION}.tar.gz && \
   tar xzf perl-${PERL_VERSION}.tar.gz && \
   cd perl-${PERL_VERSION} && \

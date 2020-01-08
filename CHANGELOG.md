@@ -7,6 +7,11 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [1.0.1] - 2020-01-08
+
+### Changed
+- Some minor bits and pieces
+
 ## [1.0.0] - 2020-01-07
 
 ### Added
