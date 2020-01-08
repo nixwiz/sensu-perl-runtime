@@ -7,6 +7,11 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [1.0.2] - 2020-01-08
+
+### Changed
+- Fix problem when mismatched github and docker.io account names
+
 ## [1.0.1] - 2020-01-08
 
 ### Changed

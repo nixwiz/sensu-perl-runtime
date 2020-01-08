@@ -51,7 +51,14 @@ if [ -z "$TRAVIS_TAG" ]; then exit 0; fi
 if [ -z "$DOCKER_USER" ]; then exit 0; fi
 if [ -z "$DOCKER_PASSWORD" ]; then exit 0; fi
 
-docker_asset=${TRAVIS_REPO_SLUG}-${perl_version}-${platform}:${asset_version}
+# In the event that of mismatch between github and docker.io usernames
+GITHUB_USER=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f1)
+if [ "${GITHUB_USER}" = "${DOCKER_USER}" ]; then
+  docker_asset=${TRAVIS_REPO_SLUG}-${perl_version}-${platform}:${asset_version}
+else
+  GITHUB_REPO=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f2)
+  docker_asset=${DOCKER_USER}/${GITHUB_REPO}-${perl_version}-${platform}:${asset_version}
+fi
 
 echo "Docker Hub Asset: ${docker_asset}"
 echo "preparing to tag and push docker hub asset"
