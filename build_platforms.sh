@@ -29,11 +29,12 @@ if [[ retval -ne 0 ]]; then
 fi
 
 # CentOS platform
-platform="centos7" test_platforms="centos:7" ./build_and_test_platform.sh
+platform="centos" test_platforms="centos:7" ./build_and_test_platform.sh
 retval=$?
 if [[ retval -ne 0 ]]; then
   exit $retval
 fi
+
 platform="centos7" test_platforms="centos:7" ./build_and_test_platform.sh
 retval=$?
 if [[ retval -ne 0 ]]; then

@@ -6,11 +6,11 @@ asset_version=${TRAVIS_TAG:-local-build}
 asset_filename=sensu-perl-runtime_${asset_version}_perl-${perl_version}_${platform}_linux_amd64.tar.gz
 asset_image=sensu-perl-runtime-${perl_version}-${platform}:${asset_version}
 
-
 if [ "${asset_version}" = "local-build" ]; then
   echo "Local build"
   ignore_errors=1
 fi
+
 
 echo "Platform: ${platform}"
 echo "Check for asset file: ${asset_filename}"
@@ -22,9 +22,13 @@ else
   if [[ "$(docker images -q ${asset_image} 2> /dev/null)" == "" ]]; then
     echo "Docker image not found...we can build"
     echo "Building Docker Image: sensu-perl-runtime:${perl_version}-${platform}"
-    docker build --build-arg "PERL_VERSION=$perl_version" --build-arg "ASSET_VERSION=$asset_version" -t ${asset_image} -f Dockerfile.${platform} .
+    if [ -n "$TRAVIS_TAG" ]; then
+      docker build --build-arg "PERL_VERSION=$perl_version" --build-arg "ASSET_VERSION=$asset_version" --build-arg "MAKE_TEST_CMD=true" --build-arg "CPANM_TEST_FLAG=--notest" -t ${asset_image} -f Dockerfile.${platform} .
+    else
+      docker build --build-arg "PERL_VERSION=$perl_version" --build-arg "ASSET_VERSION=$asset_version" -t ${asset_image} -f Dockerfile.${platform} .
+    fi
     echo "Making Asset: /assets/sensu-perl-runtime_${asset_version}_perl-${perl_version}_${platform}_linux_amd64.tar.gz"
-    docker run -v "$PWD/dist:/dist" ${asset_image} cp /assets/${asset_filename} /dist/
+    docker run --rm -v "$PWD/dist:/dist" ${asset_image} cp /assets/${asset_filename} /dist/
   else
     echo "Image already exists!!!"
     [ $ignore_errors -eq 0 ] && exit 1  

@@ -4,6 +4,8 @@ ARG PERL_VERSION=5.30.1
 ARG ASSET_VERSION=local_build
 ARG GREP_EXCLUDE='(ld.so|ld-linux-x86-64.so|libBrokenLocale.so|libSegFault.so|libanl.so|libc.so|libdl.so|libm.so|libmvec.so|libnss_compat.so|libnss_dns.so|libnss_files.so|libpthread.so|libresolv.so|librt.so|libthread_db.so|libutil.so|vdso.so)'
 ARG CPAN_MODULES="DBI JSON LWP LWP::UserAgent LWP::Protocol::https XML::LibXML Text::CSV IO::Socket::SSL Time::Zone HTTP::Response Net::SMTP WWW::Mechanize DateTime Test::Simple Net::SNMP AutoLoader Getopt::Long IO::File Module::Load File::Basename Digest::MD5 Data::Dumper"
+ARG MAKE_TEST_CMD="make test"
+ARG CPANM_TEST_FLAG=""
 
 RUN apk --no-cache add build-base gmp-dev zlib-dev gdbm-dev db-dev readline-dev libffi-dev coreutils yaml-dev linux-headers autoconf
 RUN apk --no-cache add openssh-client openssl openssl-dev expat-dev
@@ -16,11 +18,11 @@ RUN curl -s -L https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-${PERL_VERSIO
   sed -i 's!"EST5EDT4"!"EST5EDT4,M4.1.0/02:00:00,M10-5-0/02:00"!' cpan/Time-Piece/t/02core_dst.t && \
   sh Configure -Dprefix=/opt/perl -des && \
   make && \
-  make test && \
+  ${MAKE_TEST_CMD} && \
   make install && \
   curl -s -L https://cpanmin.us | /opt/perl/bin/perl - App::cpanminus && \
   PATH=/opt/perl/bin:${PATH} cpanm Monitoring::Plugin && \
-  PATH=/opt/perl/bin:${PATH} cpanm ${CPAN_MODULES} --force --notest && \
+  PATH=/opt/perl/bin:${PATH} cpanm --force --notest ${CPAN_MODULES} && \
   rm -rf /opt/perl/man /perl-${PERL_VERSION}.tar.gz /perl-${PERL_VERSION} /root/.cpanm && \
   cd /opt/perl/lib/site_perl/${PERL_VERSION} && \
   cp -a -f . ../../${PERL_VERSION} && \
