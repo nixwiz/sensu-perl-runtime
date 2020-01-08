@@ -23,8 +23,10 @@ else
     echo "Docker image not found...we can build"
     echo "Building Docker Image: sensu-perl-runtime:${perl_version}-${platform}"
     if [ -n "$TRAVIS_TAG" ]; then
+      echo "Building in Travis, skipping make test and using cpanm --notest"
       docker build --build-arg "PERL_VERSION=$perl_version" --build-arg "ASSET_VERSION=$asset_version" --build-arg "MAKE_TEST_CMD=true" --build-arg "CPANM_TEST_FLAG=--notest" -t ${asset_image} -f Dockerfile.${platform} .
     else
+      echo "Not building in Travis, running build tests for Perl and cpanm"
       docker build --build-arg "PERL_VERSION=$perl_version" --build-arg "ASSET_VERSION=$asset_version" -t ${asset_image} -f Dockerfile.${platform} .
     fi
     echo "Making Asset: /assets/sensu-perl-runtime_${asset_version}_perl-${perl_version}_${platform}_linux_amd64.tar.gz"
