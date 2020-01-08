@@ -54,11 +54,13 @@ if [ -z "$DOCKER_PASSWORD" ]; then exit 0; fi
 # In the event that of mismatch between github and docker.io usernames
 GITHUB_USER=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f1)
 if [ "${GITHUB_USER}" = "${DOCKER_USER}" ]; then
-  docker_asset=${TRAVIS_REPO_SLUG}-${perl_version}-${platform}:${asset_version}
+  DOCKER_SLUG=${TRAVIS_REPO_SLUG}
 else
   GITHUB_REPO=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f2)
-  docker_asset=${DOCKER_USER}/${GITHUB_REPO}-${perl_version}-${platform}:${asset_version}
+  DOCKER_SLUG=${DOCKER_USER}/${GITHUB_REPO}
 fi
+
+docker_asset=${DOCKER_SLUG}-${perl_version}-${platform}:${asset_version}
 
 echo "Docker Hub Asset: ${docker_asset}"
 echo "preparing to tag and push docker hub asset"
@@ -73,7 +75,7 @@ prefix=${ver%-*}
 prerel=${ver/#$prefix}
 if [ -z "$prerel" ]; then 
   echo "tagging as latest asset"
-  latest_asset=${TRAVIS_REPO_SLUG}-${perl_version}-${platform}:latest
+  latest_asset=${DOCKER_SLUG}-${perl_version}-${platform}:latest
   docker tag ${asset_image} ${latest_asset}
   docker push ${latest_asset}
 fi
