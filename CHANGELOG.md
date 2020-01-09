@@ -7,6 +7,11 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [1.0.4] - 2020-01-09
+
+### Changed
+- Fixed Alpine build to be more in line with Ruby Runtime build
+
 ## [1.0.3] - 2020-01-08
 
 ### Changed
