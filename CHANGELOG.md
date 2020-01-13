@@ -7,6 +7,11 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [1.0.5] - 2020-01-13
+
+### Changed
+- Fixed Perl build to use -Duserelocatableinc so it can be relocated
+
 ## [1.0.4] - 2020-01-09
 
 ### Changed
