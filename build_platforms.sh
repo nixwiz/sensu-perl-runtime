@@ -4,12 +4,7 @@ mkdir -p dist
 mkdir -p assets
 mkdir -p scripts
 
-# Debian platform
-platform="debian" test_platforms="debian:8 debian:9 debian:10 ubuntu:14.04 ubuntu:16.04 ubuntu:18.04" ./build_and_test_platform.sh
-retval=$?
-if [[ retval -ne 0 ]]; then
-  exit $retval
-fi
+# Debian platforms
 platform="debian9" test_platforms="debian:8 debian:9 debian:10 ubuntu:14.04 ubuntu:16.04 ubuntu:18.04" ./build_and_test_platform.sh
 retval=$?
 if [[ retval -ne 0 ]]; then
@@ -28,8 +23,8 @@ if [[ retval -ne 0 ]]; then
   exit $retval
 fi
 
-# CentOS platform
-platform="centos" test_platforms="centos:7" ./build_and_test_platform.sh
+# CentOS platforms
+platform="centos6" test_platforms="centos:6" ./build_and_test_platform.sh
 retval=$?
 if [[ retval -ne 0 ]]; then
   exit $retval
@@ -41,14 +36,6 @@ if [[ retval -ne 0 ]]; then
   exit $retval
 fi
 
-# CentOS 6 platform
-platform="centos6" test_platforms="centos:6" ./build_and_test_platform.sh
-retval=$?
-if [[ retval -ne 0 ]]; then
-  exit $retval
-fi
-
-# CentOS 8 platform
 platform="centos8" test_platforms="centos:8" ./build_and_test_platform.sh
 retval=$?
 if [[ retval -ne 0 ]]; then
