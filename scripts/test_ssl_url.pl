@@ -6,7 +6,7 @@ my $ua = LWP::UserAgent->new(timeout => 10);
 $ua->env_proxy;
 $ua->ssl_opts( verify_hostnames => 0 );
 
-my $response = $ua->get("http://www.sensu.io/");
+my $response = $ua->get("https://www.sensu.io/");
 
 if ($response->is_success) {
     print "Success!\n";
