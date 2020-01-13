@@ -10,5 +10,5 @@ fi
 mkdir -p /build
 cd /build
 tar xzf /dist/$asset_filename
-LD_LIBRARY_PATH="/build/lib:$LD_LIBRARY_PATH" PERL5LIB="/build/lib:$PERL5LIB" /build/bin/perl /scripts/test_ssl_url.pl
+LD_LIBRARY_PATH="/build/lib:$LD_LIBRARY_PATH" /build/bin/perl /scripts/test_ssl_url.pl
 
