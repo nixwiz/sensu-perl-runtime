@@ -20,7 +20,6 @@ RUN curl -s -L https://www.cpan.org/src/5.0/perl-${PERL_VERSION}.tar.gz -o perl-
   PATH=/opt/perl/bin:${PATH} cpanm Monitoring::Plugin && \
   PATH=/opt/perl/bin:${PATH} cpanm --force ${CPANM_TEST_FLAG} ${CPAN_MODULES} && \
   rm -rf /opt/perl/man /perl-${PERL_VERSION}.tar.gz /perl-${PERL_VERSION} /root/.cpanm && \
-  rm -rf /opt/perl/lib/site_perl/${PERL_VERSION} /perl-${PERL_VERSION}.tar.gz /perl-${PERL_VERSION} /root/.cpanm && \
   yum clean all
 
 RUN LIBS=$(find /opt/perl -type f -executable -exec ldd {} 2>/dev/null \;|  grep "=>" | egrep -v ${GREP_EXCLUDE} | awk '{print $3}'| sort -u ) && \
