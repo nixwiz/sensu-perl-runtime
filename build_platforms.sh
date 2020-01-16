@@ -23,20 +23,20 @@ if [[ retval -ne 0 ]]; then
   exit $retval
 fi
 
-# CentOS platforms
-platform="centos6" test_platforms="centos:6" ./build_and_test_platform.sh
+# RHEL and derivative platforms
+platform="centos6" test_platforms="centos:6 oraclelinux:6" ./build_and_test_platform.sh
 retval=$?
 if [[ retval -ne 0 ]]; then
   exit $retval
 fi
 
-platform="centos7" test_platforms="centos:7" ./build_and_test_platform.sh
+platform="centos7" test_platforms="centos:7 oraclelinux:7" ./build_and_test_platform.sh
 retval=$?
 if [[ retval -ne 0 ]]; then
   exit $retval
 fi
 
-platform="centos8" test_platforms="centos:8" ./build_and_test_platform.sh
+platform="centos8" test_platforms="centos:8 oraclelinux:8" ./build_and_test_platform.sh
 retval=$?
 if [[ retval -ne 0 ]]; then
   exit $retval
