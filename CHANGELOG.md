@@ -7,6 +7,11 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [1.0.6] - 2020-01-16
+
+### Changed
+- Updated build testing to include Oracle Linux
+
 ## [1.0.5] - 2020-01-13
 
 ### Changed
