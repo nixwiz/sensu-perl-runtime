@@ -1,11 +1,13 @@
 FROM centos:6
 
-ARG PERL_VERSION=5.30.1
+ARG PERL_VERSION=5.34.0
 ARG ASSET_VERSION=local_build
 ARG GREP_EXCLUDE='(ld.so|ld-linux-x86-64.so|libBrokenLocale.so|libSegFault.so|libanl.so|libc.so|libdl.so|libm.so|libmvec.so|libnss_compat.so|libnss_dns.so|libnss_files.so|libpthread.so|libresolv.so|librt.so|libthread_db.so|libutil.so|vdso.so)'
-ARG CPAN_MODULES="DBI JSON LWP LWP::UserAgent LWP::Protocol::https XML::LibXML Text::CSV IO::Socket::SSL Time::Zone HTTP::Response Net::SMTP WWW::Mechanize DateTime Test::Simple Net::SNMP AutoLoader Getopt::Long IO::File Module::Load File::Basename Digest::MD5 Data::Dumper"
+ARG CPAN_MODULES="DBI JSON LWP LWP::UserAgent LWP::Protocol::https XML::LibXML Text::CSV IO::Socket::SSL Time::Zone HTTP::Response Net::SMTP WWW::Mechanize DateTime Test::Simple Net::SNMP AutoLoader Getopt::Long IO::File Module::Load File::Basename Digest::MD5 Data::Dumper File::Slurp JSON::XS"
 ARG MAKE_TEST_CMD="make test"
 ARG CPANM_TEST_FLAG=""
+ARG NETSNMP_INSTALL=false
+ARG NETSNMP_VERSION=5.9.1
 
 RUN yum update -y && yum groupinstall -y "Development Tools" && yum install -y curl expat-devel openssl openssl-devel
 
@@ -22,11 +24,20 @@ RUN curl -s -L https://www.cpan.org/src/5.0/perl-${PERL_VERSION}.tar.gz -o perl-
   rm -rf /opt/perl/man /perl-${PERL_VERSION}.tar.gz /perl-${PERL_VERSION} /root/.cpanm && \
   yum clean all
 
+RUN if [ $NETSNMP_INSTALL == "true" ]; then curl -s -L https://sourceforge.net/projects/net-snmp/files/net-snmp/${NETSNMP_VERSION}/net-snmp-${NETSNMP_VERSION}.tar.gz -o net-snmp-${NETSNMP_VERSION}.tar.gz && \
+  tar xzf net-snmp-${NETSNMP_VERSION}.tar.gz && \
+  cd net-snmp-${NETSNMP_VERSION} && \
+  env PERLPROG=/opt/perl/bin/perl sh ./configure --prefix=/opt/perl --with-perl-modules --with-default-snmp-version="2" --disable-embedded-perl --disable-snmptrapd-subagent --disable-manuals --disable-agent --disable-scripts && \
+  make && \
+  make install && \
+  rm -rf /net-snmp-${NETSNMP_VERSION}.tar.gz /net-snmp-${NETSNMP_VERSION} \
+  ; fi
+
 RUN LIBS=$(find /opt/perl -type f -executable -exec ldd {} 2>/dev/null \;|  grep "=>" | egrep -v ${GREP_EXCLUDE} | awk '{print $3}'| sort -u ) && \
   for f in $LIBS; do if [ -e $f ]; then echo "Copying Library: $f" && cp $f /opt/perl/lib/; fi; done
 
 RUN mkdir /assets/ && \
-  export SENSU_ASSET="/assets/sensu-perl-runtime_${ASSET_VERSION}_perl-${PERL_VERSION}_centos6_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.tar.gz" && \
+  export SENSU_ASSET="/assets/sensu-perl-runtime_${ASSET_VERSION}_perl-${PERL_VERSION}_$([[ $NETSNMP_INSTALL == "true" ]] && echo net-snmp-${NETSNMP_VERSION}_)$(source /etc/os-release && echo $ID$VERSION_ID)_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.tar.gz" && \
   tar -czf $SENSU_ASSET -C /opt/perl/ . && \
   ls -l $SENSU_ASSET
 

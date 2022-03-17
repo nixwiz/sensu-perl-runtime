@@ -40,11 +40,13 @@ The following modules (and their dependencies) are packaged as part of the runti
 * DateTime
 * Digest::MD5
 * File::Basename
+* File::Slurp
 * Getopt::Long
 * HTTP::Response
 * IO::File
 * IO::Socket::SSL
 * JSON
+* JSON::XS
 * LWP
 * LWP::Protocol::https
 * LWP::UserAgent
@@ -69,23 +71,35 @@ Please note the following instructions:
 
 1. Use a Docker container to build Perl, and generate a local_build Sensu Go Asset.
 
+   Without NET-SNMP:
    ```
-   $ docker build --build-arg "PERL_VERSION=5.30.1" -t sensu-perl-runtime:5.30.1-debian -f Dockerfile.debian .
+   $ docker build --build-arg "PERL_VERSION=5.34.0" -t sensu-perl-runtime:5.34.0-debian -f Dockerfile.debian .
+   ```
+   With NET-SNMP:
+   ```
+   $ docker build --build-arg "PERL_VERSION=5.34.0" --build-arg "NETSNMP_INSTALL=true" --build-arg "NETSNMP_VERSION=5.9.1" -t sensu-perl-runtime:5.34.0-net-snmp-5.9.1-debian -f Dockerfile.debian .
    ```
 
 2. Extract your new sensu-perl asset, and get the SHA-512 hash for your Sensu asset!
 
+   Without NET-SNMP:
    ```
    $ mkdir dist
-   $ docker run -v "$PWD/dist:/dist" sensu-perl-runtime:5.30.1-debian cp /assets/sensu-perl-runtime_local-build_perl-5.30.1_debian_linux_amd64.tar.gz /dist/
-   $ shasum -a 512 dist/sensu-perl-runtime_local-build_perl-5.30.1_debian_linux_amd64.tar.gz
+   $ docker run -v "$PWD/dist:/dist" sensu-perl-runtime:5.34.0-debian cp /assets/sensu-perl-runtime_local-build_perl-5.34.0_debian_linux_amd64.tar.gz /dist/
+   $ shasum -a 512 dist/sensu-perl-*
+   ```
+   With NET-SNMP:
+   ```
+   $ mkdir dist
+   $ docker run -v "$PWD/dist:/dist" sensu-perl-runtime:5.34.0-net-snmp-5.9.1-debian bash -c "cp /assets/sensu-perl-runtime* /dist/"
+   $ shasum -a 512 dist/sensu-perl-*
    ```
 
 3. Put that asset somewhere that your Sensu agent can fetch it. Perhaps add it to the Bonsai asset index!
 
 4. Create an asset resource in Sensu Go.
 
-   First, create a configuration file called `sensu-perl-runtime-5.30.1-debian.json` with
+   First, create a configuration file called `sensu-perl-runtime-5.34.0-debian.json` with
    the following contents:
 
    ```
@@ -93,13 +107,13 @@ Please note the following instructions:
      "type": "Asset",
      "api_version": "core/v2",
      "metadata": {
-       "name": "sensu-ruby-runtime-5.30.1-debian",
+       "name": "sensu-ruby-runtime-5.34.0-debian",
        "namespace": "default",
        "labels": {},
        "annotations": {}
      },
      "spec": {
-       "url": "http://your-asset-server-here/assets/sensu-perl_local-build_perl-5.30.1_debian_linux_amd64.tar.gz",
+       "url": "http://your-asset-server-here/assets/sensu-perl_local-build_perl-5.34.0_debian_linux_amd64.tar.gz",
        "sha512": "4f926bf4328fbad2b9cac873d117f771914f4b837c9c85584c38ccf55a3ef3c2e8d154812246e5dda4a87450576b2c58ad9ab40c9e2edc31b288d066b195b21b",
        "filters": [
          "entity.system.os == 'linux'",
@@ -113,7 +127,7 @@ Please note the following instructions:
    Then create the asset via:
 
    ```
-   $ sensuctl create -f sensu-perl-runtime-5.30.1-debian.json
+   $ sensuctl create -f sensu-perl-runtime-5.34.0-debian.json
    ```
 
 4. Create a second asset containing a Perl script.
@@ -156,7 +170,7 @@ Please note the following instructions:
      },
      "spec": {
        "command": "helloworld.pl",
-       "runtime_assets": ["sensu-perl-runtime-5.30.1-debian", "helloworld-v0.1"],
+       "runtime_assets": ["sensu-perl-runtime-5.34.0-debian", "helloworld-v0.1"],
        "publish": true,
        "interval": 10,
        "subscriptions": ["docker"]

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ignore_errors=0
-perl_version=5.30.1
+perl_version=5.34.0
 asset_version=${TRAVIS_TAG:-local-build}
 asset_filename=sensu-perl-runtime_${asset_version}_perl-${perl_version}_${platform}_linux_amd64.tar.gz
 asset_image=sensu-perl-runtime-${perl_version}-${platform}:${asset_version}
