@@ -7,6 +7,15 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [1.1.0] - 2022-03-17
+
+### Changed
+- Updated Perl version to 5.34.0
+
+### Added
+- NETSNMP_INSTALL option
+- add File-Slurp and JSON-XS module
+
 ## [1.0.6] - 2020-01-16
 
 ### Changed
