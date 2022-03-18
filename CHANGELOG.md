@@ -7,7 +7,7 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-## [1.2.0] - 2022-03-18
+## [1.2.1] - 2022-03-18
 
 ### Changed
 - Transitioned from Travis CI to Github Actions
