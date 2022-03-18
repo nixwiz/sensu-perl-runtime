@@ -2,7 +2,7 @@
 
 ignore_errors=0
 perl_version=5.34.0
-asset_version=${TRAVIS_TAG:-local-build}
+asset_version=${TAG:-local-build}
 asset_filename=sensu-perl-runtime_${asset_version}_perl-${perl_version}_${platform}_linux_amd64.tar.gz
 asset_image=sensu-perl-runtime-${perl_version}-${platform}:${asset_version}
 
@@ -21,13 +21,7 @@ else
   if [[ "$(docker images -q ${asset_image} 2> /dev/null)" == "" ]]; then
     echo "Docker image not found...we can build"
     echo "Building Docker Image: sensu-perl-runtime:${perl_version}-${platform}"
-    if [ "${TRAVIS}" = "true" ]; then
-      echo "Building in Travis, skipping make test and using cpanm --notest"
-      docker build --build-arg "PERL_VERSION=$perl_version" --build-arg "ASSET_VERSION=$asset_version" --build-arg "MAKE_TEST_CMD=true" --build-arg "CPANM_TEST_FLAG=--notest" -t ${asset_image} -f Dockerfile.${platform} .
-    else
-      echo "Not building in Travis, running build tests for Perl and cpanm"
-      docker build --build-arg "PERL_VERSION=$perl_version" --build-arg "ASSET_VERSION=$asset_version" -t ${asset_image} -f Dockerfile.${platform} .
-    fi
+    docker build --build-arg "PERL_VERSION=$perl_version" --build-arg "ASSET_VERSION=$asset_version" --build-arg "MAKE_TEST_CMD=true" --build-arg "CPANM_TEST_FLAG=--notest" -t ${asset_image} -f Dockerfile.${platform} .
     echo "Making Asset: /assets/sensu-perl-runtime_${asset_version}_perl-${perl_version}_${platform}_linux_amd64.tar.gz"
     docker run --rm -v "$PWD/dist:/dist" ${asset_image} cp /assets/${asset_filename} /dist/
   else
@@ -47,16 +41,16 @@ for test_platform in "${test_arr[@]}"; do
   fi
 done
 
-if [ -z "$TRAVIS_TAG" ]; then exit 0; fi
+if [ -z "$TAG" ]; then exit 0; fi
 if [ -z "$DOCKER_USER" ]; then exit 0; fi
 if [ -z "$DOCKER_PASSWORD" ]; then exit 0; fi
 
 # In the event that of mismatch between github and docker.io usernames
-GITHUB_USER=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f1)
+GITHUB_USER=$(echo $REPO_SLUG | cut -d/ -f1)
 if [ "${GITHUB_USER}" = "${DOCKER_USER}" ]; then
-  DOCKER_SLUG=${TRAVIS_REPO_SLUG}
+  DOCKER_SLUG=${REPO_SLUG}
 else
-  GITHUB_REPO=$(echo $TRAVIS_REPO_SLUG | cut -d/ -f2)
+  GITHUB_REPO=$(echo $REPO_SLUG | cut -d/ -f2)
   DOCKER_SLUG=${DOCKER_USER}/${GITHUB_REPO}
 fi
 

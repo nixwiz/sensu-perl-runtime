@@ -1,5 +1,6 @@
 # Sensu Go Perl Runtime Assets
-[![Build Status](https://travis-ci.org/nixwiz/sensu-perl-runtime.svg?branch=master)](https://travis-ci.org/nixwiz/sensu-perl-runtime)
+![release](https://github.com/nixwiz/sensu-go-fatigue-check-filter/workflows/release/badge.svg)
+
 
 This project provides [Sensu Go Assets][sensu-assets] containing portable Perl
 runtimes (for various platforms), based on [Sensu Ruby Runtime][sensu-ruby-runtime]
@@ -8,7 +9,7 @@ by postmodern][ruby-install]. In practice, this Perl runtime asset should allow
 Perl-based scripts (e.g. [Sensu Community plugins][sensu-plugins]) to be
 packaged as separate assets containing Perl scripts and any corresponding module
 dependencies. In this way, a single shared Perl runtime may be delivered to
-systems running the new Sensu Go Agent via the new Sensu's new Asset framework
+systems running the new Sensu Go Agent via the new Sensu's Asset framework
 (i.e. avoiding solutions that would require a Perl runtime to be redundantly
 packaged with every perl-based plugin).
 
@@ -20,17 +21,17 @@ packaged with every perl-based plugin).
 ## Platform Coverage
 Currently this repository only supports a subset of Linux distribution by making
 use of Docker containers to build and test.  If you would like extend the coverage,
-please take a look at the travisCI integration and test build scripts. We're happy
+please take a look at the Github Action and test build scripts. I'm happy
 to take pull requests that extending the platform coverage.  Here's the current
 platform matrix that we are testing for as of the current release:
 
-| Asset Platform | Tested Operating Systems Docker Images |
-|:---------------|:-------------------------|
-|  alpine  (based on alpine:3.8)   | Alpine(3, 3.8, latest)                                      |
-|  centos6 (based on centos:6)     | CentOS(6), Oracle Linux(6)                                  |
-|  centos7 (based on centos:7)     | CentOS(7), Oracle Linux(7)                                  |
-|  centos8 (based on centos:8)     | CentOS(8), Oracle Linux(8)                                  |
-|  debian9 (based on debian:9)     | Debian(8, 9, 10), Ubuntu(14.04, 16.04, 18.04)               |
+| Asset Platform                    | Tested Operating Systems Docker Images        |
+|:----------------------------------|:----------------------------------------------|
+|  alpine  (based on alpine:3.8)    | Alpine(3, 3.8, latest)                        |
+|  centos7 (based on centos:7)      | CentOS(7), Oracle Linux(7)                    |
+|  rocky8  (based on rockylinux:8)  | Rocky Linux(8), Oracle Linux(8)               |
+|  amzn2   (Based on amazonlinux:2) | Amazon Linux(2)                               |
+|  debian9 (based on debian:9)      | Debian(8, 9, 10), Ubuntu(14.04, 16.04, 18.04) |
 
 ## Modules Included
 The following modules (and their dependencies) are packaged as part of the runtime:
@@ -60,7 +61,9 @@ The following modules (and their dependencies) are packaged as part of the runti
 * XML::LibXML
 
 ## To do
-Need a note about adding additional modules
+* Need a note about adding additional modules, but first I need to remember what I planned to write here.
+* Rewrite this README.  It was adapted from the Ruby Runtime and may not be completely up-to-date and accurate.
+* Make it a Bonsai asset?
 
 ## Instructions
 ## OpenSSL Cert Dir

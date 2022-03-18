@@ -1,0 +1,41 @@
+name: Build Docker Image CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      id: checkout
+      uses: actions/checkout@v2
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/') 
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: false
+        prerelease: false
+    - name: Get the version
+      id: get_version
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/') 
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: Build
+      env: 
+        TAG: ${{ steps.get_version.outputs.VERSION }}
+        REPO_SLUG: ${{ github.repository }}
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: ./build_platforms.sh
+    - name: create checksum file
+      run: ./checksum.sh 
+    - name: Upload Release files
+      id: upload-files
+      uses: softprops/action-gh-release@v1
+      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/') 
+      with:
+        files: dist/*

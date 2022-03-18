@@ -3,7 +3,7 @@
 install_tar() {
   # Please don't look at me, I'm hideous
   if type yum > /dev/null 2>&1; then
-    yum -y install tar
+    yum -y install tar gzip
   elif type apt-get > /dev/null 2>&1; then
     apt-get install -y tar
   elif type apk > /dev/null 2>&1; then
