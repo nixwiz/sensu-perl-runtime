@@ -12,7 +12,7 @@ RUN apk --no-cache add build-base gmp-dev zlib-dev gdbm-dev db-dev readline-dev 
 RUN apk --no-cache add openssh-client openssl openssl-dev expat-dev
 RUN apk --no-cache add curl wget git sudo bash bash-doc bash-completion procps
 
-RUN curl -s -L https://www.cpan.org/src/5.0/perl-${PERL_VERSION}.tar.gz -o perl-${PERL_VERSION}.tar.gz && \
+RUN curl -k -s -L https://www.cpan.org/src/5.0/perl-${PERL_VERSION}.tar.gz -o perl-${PERL_VERSION}.tar.gz && \
   tar xzf perl-${PERL_VERSION}.tar.gz && \
   cd perl-${PERL_VERSION} && \
   sed -i 's!"EST5EDT4"!"EST5EDT4,M4.1.0/02:00:00,M10-5-0/02:00"!' cpan/Time-Piece/t/02core_dst.t && \
@@ -20,12 +20,12 @@ RUN curl -s -L https://www.cpan.org/src/5.0/perl-${PERL_VERSION}.tar.gz -o perl-
   make && \
   ${MAKE_TEST_CMD} && \
   make install && \
-  curl -s -L https://cpanmin.us | /opt/perl/bin/perl - App::cpanminus && \
+  curl -k -s -L https://cpanmin.us | /opt/perl/bin/perl - App::cpanminus && \
   PATH=/opt/perl/bin:${PATH} cpanm Monitoring::Plugin && \
   PATH=/opt/perl/bin:${PATH} cpanm --force --notest ${CPAN_MODULES} && \
   rm -rf /opt/perl/man /perl-${PERL_VERSION}.tar.gz /perl-${PERL_VERSION} /root/.cpanm
 
-RUN if [ $NETSNMP_INSTALL == "true" ]; then curl -s -L https://sourceforge.net/projects/net-snmp/files/net-snmp/${NETSNMP_VERSION}/net-snmp-${NETSNMP_VERSION}.tar.gz -o net-snmp-${NETSNMP_VERSION}.tar.gz && \
+RUN if test $NETSNMP_INSTALL == "true"; then curl -k -s -L https://sourceforge.net/projects/net-snmp/files/net-snmp/${NETSNMP_VERSION}/net-snmp-${NETSNMP_VERSION}.tar.gz -o net-snmp-${NETSNMP_VERSION}.tar.gz && \
   tar xzf net-snmp-${NETSNMP_VERSION}.tar.gz && \
   cd net-snmp-${NETSNMP_VERSION} && \
   env PERLPROG=/opt/perl/bin/perl sh ./configure --prefix=/opt/perl --with-perl-modules --with-default-snmp-version="2" --disable-embedded-perl --disable-snmptrapd-subagent --disable-manuals --disable-agent --disable-scripts && \
@@ -35,10 +35,10 @@ RUN if [ $NETSNMP_INSTALL == "true" ]; then curl -s -L https://sourceforge.net/p
   ; fi
 
 RUN LIBS=$(find /opt/perl -type f -exec ldd {} 2>/dev/null \;|  grep "=>" | grep -v "vdso.so.1" | awk '{print $3}'| sort -u ) && \
-  for f in $LIBS; do if [ -e $f ]; then echo "Copying Library: $f" && cp $f /opt/perl/lib/; fi; done
+  for f in $LIBS; do if test -e $f; then echo "Copying Library: $f" && cp $f /opt/perl/lib/; fi; done
 
 RUN mkdir /assets/ && \
-  export SENSU_ASSET="/assets/sensu-perl-runtime_${ASSET_VERSION}_perl-${PERL_VERSION}_$([[ $NETSNMP_INSTALL == "true" ]] && echo net-snmp-${NETSNMP_VERSION}_)alpine_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.tar.gz" && \
+  export SENSU_ASSET="/assets/sensu-perl-runtime_${ASSET_VERSION}_perl-${PERL_VERSION}_$(test $NETSNMP_INSTALL == "true" && echo net-snmp-${NETSNMP_VERSION}_)alpine3.8_$(uname -s | tr '[:upper:]' '[:lower:]')_amd64.tar.gz" && \
   tar -czf $SENSU_ASSET -C /opt/perl/ . && \
   ls -l $SENSU_ASSET
 
