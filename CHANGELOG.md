@@ -7,16 +7,19 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## [1.2.0] - 2022-03-18
+
 ### Changed
 - Transitioned from Travis CI to Github Actions
 - Replaced CentOS 8 with Rocky Linux 8 for building for RHEL 8 and derivatives
-- Use test instead of [] and [[ ]] across all because Debian 9 /bin/sh is braindead
+- Replace [] and [[ ]] with test across all because Debian 9 /bin/sh is braindead (had to use /usr/bin/test to avoid shell builtin)
 
 ### Added
 - Amazon Linux 2 support
 
 ### Removed
 - CentOS 6 due to EOL
+- Redundant Alpine config
 
 ## [1.1.0] - 2022-03-17
 
