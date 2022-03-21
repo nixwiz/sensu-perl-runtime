@@ -1,24 +1,22 @@
 # Sensu Go Perl Runtime Assets
 ![release](https://github.com/nixwiz/sensu-go-fatigue-check-filter/workflows/release/badge.svg)
 
-
 This project provides [Sensu Go Assets][sensu-assets] containing portable Perl
 runtimes (for various platforms), based on [Sensu Ruby Runtime][sensu-ruby-runtime]
 which itself was based on the excellent [ruby-install project
 by postmodern][ruby-install]. In practice, this Perl runtime asset should allow
-Perl-based scripts (e.g. [Sensu Community plugins][sensu-plugins]) to be
-packaged as separate assets containing Perl scripts and any corresponding module
-dependencies. In this way, a single shared Perl runtime may be delivered to
-systems running the new Sensu Go Agent via the new Sensu's Asset framework
+Perl-based scripts to be packaged as separate assets containing Perl scripts and
+any corresponding module dependencies. In this way, a single shared Perl runtime
+may be delivered to systems running the Sensu Go Agent via the Sensu's Asset framework
 (i.e. avoiding solutions that would require a Perl runtime to be redundantly
 packaged with every perl-based plugin).
 
 [sensu-assets]: https://docs.sensu.io/sensu-go/latest/reference/assets/
 [sensu-ruby-runtime]: https://github.com/sensu/sensu-ruby-runtime
 [ruby-install]: https://github.com/postmodern/ruby-install
-[sensu-plugins]: https://github.com/sensu-plugins/
 
 ## Platform Coverage
+
 Currently this repository only supports a subset of Linux distribution by making
 use of Docker containers to build and test.  If you would like extend the coverage,
 please take a look at the Github Action and test build scripts. I'm happy
@@ -30,10 +28,11 @@ platform matrix that we are testing for as of the current release:
 |  alpine  (based on alpine:3.8)    | Alpine(3, 3.8, latest)                        |
 |  centos7 (based on centos:7)      | CentOS(7), Oracle Linux(7)                    |
 |  rocky8  (based on rockylinux:8)  | Rocky Linux(8), Oracle Linux(8)               |
-|  amzn2   (Based on amazonlinux:2) | Amazon Linux(2)                               |
+|  amzn2   (based on amazonlinux:2) | Amazon Linux(2)                               |
 |  debian9 (based on debian:9)      | Debian(8, 9, 10), Ubuntu(14.04, 16.04, 18.04) |
 
 ## Modules Included
+
 The following modules (and their dependencies) are packaged as part of the runtime:
 * AutoLoader
 * DBI
@@ -53,54 +52,41 @@ The following modules (and their dependencies) are packaged as part of the runti
 * LWP::UserAgent
 * Module::Load
 * Net::SMTP
-* Net::SNMP
+* Net::SNMP<sup>1</sup>
 * Test::Simple
 * Text::CSV
 * Time::Zone
 * WWW::Mechanize
 * XML::LibXML
 
-## To do
-* Need a note about adding additional modules, but first I need to remember what I planned to write here.
-* Rewrite this README.  It was adapted from the Ruby Runtime and may not be completely up-to-date and accurate.
-* Make it a Bonsai asset?
+1. The Net::SNMP module is not included for Alpine as I gave up on trying to get it to work in the Docker build environment.
 
-## Instructions
-## OpenSSL Cert Dir
-Please note that when using the perl runtime asset built on a target OS that is different from the build platform, you may need to explicitly set the SSL_CERT_DIR environment variable to match the target OS filesystem.  Example: CentOS configures it libssl libraries to look for certs by default in `/etc/pki/tls/certs` and Debian/Ubuntu use `/usr/lib/ssl/certs`. The CentOS runtime asset when used on a Debian system would require the use of SSL_CERT_DIR override in the check command to correctly set the cert path to `/usr/lib/ssl/certs`
+## Using the assets (non-Bonsai)
 
+### Dowloadable releases
 
-Please note the following instructions:
+Releases are currently available on [Github][https://github.com/nixwiz/sensu-perl-runtime/releases].
+
+### Building the assets locally
 
 1. Use a Docker container to build Perl, and generate a local_build Sensu Go Asset.
 
-   Without NET-SNMP:
    ```
    $ docker build --build-arg "PERL_VERSION=5.34.0" -t sensu-perl-runtime:5.34.0-debian -f Dockerfile.debian .
-   ```
-   With NET-SNMP:
-   ```
-   $ docker build --build-arg "PERL_VERSION=5.34.0" --build-arg "NETSNMP_INSTALL=true" --build-arg "NETSNMP_VERSION=5.9.1" -t sensu-perl-runtime:5.34.0-net-snmp-5.9.1-debian -f Dockerfile.debian .
    ```
 
 2. Extract your new sensu-perl asset, and get the SHA-512 hash for your Sensu asset!
 
-   Without NET-SNMP:
    ```
    $ mkdir dist
    $ docker run -v "$PWD/dist:/dist" sensu-perl-runtime:5.34.0-debian cp /assets/sensu-perl-runtime_local-build_perl-5.34.0_debian_linux_amd64.tar.gz /dist/
    $ shasum -a 512 dist/sensu-perl-*
    ```
-   With NET-SNMP:
-   ```
-   $ mkdir dist
-   $ docker run -v "$PWD/dist:/dist" sensu-perl-runtime:5.34.0-net-snmp-5.9.1-debian bash -c "cp /assets/sensu-perl-runtime* /dist/"
-   $ shasum -a 512 dist/sensu-perl-*
-   ```
+### Using the assets
 
-3. Put that asset somewhere that your Sensu agent can fetch it. Perhaps add it to the Bonsai asset index!
+1. Put that asset somewhere that your Sensu agent can fetch it. Perhaps add it to the Bonsai asset index!
 
-4. Create an asset resource in Sensu Go.
+2. Create an asset resource in Sensu Go.
 
    First, create a configuration file called `sensu-perl-runtime-5.34.0-debian.json` with
    the following contents:
@@ -133,7 +119,7 @@ Please note the following instructions:
    $ sensuctl create -f sensu-perl-runtime-5.34.0-debian.json
    ```
 
-4. Create a second asset containing a Perl script.
+3. Create a second asset containing a Perl script.
 
    To run a simple test using the Perl runtime asset, create another asset
    called `helloworld-v0.1.tar.gz` with a simple perl script at
@@ -156,7 +142,7 @@ Please note the following instructions:
    Compress this file into a g-zipped tarball and register this asset with
    Sensu, and then you're all ready to run some tests!
 
-5. Create a check resource in Sensu Go.
+4. Create a check resource in Sensu Go.
 
    First, create a configuration file called `helloworld.json` with
    the following contents:
@@ -194,3 +180,6 @@ Please note the following instructions:
    resolving the Perl shebang (`#!/usr/bin/env perl`) to the Perl runtime
    on the Sensu agent `$PATH`.
    
+## Additional modules
+
+TBD on how to make use of modules not currently included.

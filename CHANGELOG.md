@@ -7,6 +7,10 @@ Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Changed
+- Install net-snmp modules by default (except alpine)
+- Fix README to reflect above and clean up
+
 ## [1.2.1] - 2022-03-18
 
 ### Changed
