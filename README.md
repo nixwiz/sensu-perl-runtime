@@ -16,6 +16,7 @@ packaged with every perl-based plugin).
 [ruby-install]: https://github.com/postmodern/ruby-install
 
 ## Platform Coverage
+
 Currently this repository only supports a subset of Linux distribution by making
 use of Docker containers to build and test.  If you would like extend the coverage,
 please take a look at the Github Action and test build scripts. I'm happy
@@ -27,7 +28,7 @@ platform matrix that we are testing for as of the current release:
 |  alpine  (based on alpine:3.8)    | Alpine(3, 3.8, latest)                        |
 |  centos7 (based on centos:7)      | CentOS(7), Oracle Linux(7)                    |
 |  rocky8  (based on rockylinux:8)  | Rocky Linux(8), Oracle Linux(8)               |
-|  amzn2   (Based on amazonlinux:2) | Amazon Linux(2)                               |
+|  amzn2   (based on amazonlinux:2) | Amazon Linux(2)                               |
 |  debian9 (based on debian:9)      | Debian(8, 9, 10), Ubuntu(14.04, 16.04, 18.04) |
 
 ## Modules Included
